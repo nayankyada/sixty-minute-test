@@ -14,6 +14,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { TaskForm } from "./TaskForm";
+import { Label } from "./ui/label";
 
 interface TaskCardProps {
   task: Task;
@@ -50,8 +51,7 @@ export const TaskCard = ({ task, setTasks }: TaskCardProps) => {
   );
 
   return (
-    <Card>
-      {/* Implement your TaskCard component here */}
+    <Card className="w-full">
       {showForm && (
         <TaskForm
           setShowForm={setShowForm}
@@ -80,7 +80,15 @@ export const TaskCard = ({ task, setTasks }: TaskCardProps) => {
             <span>Status: {task.completed ? "Completed" : "Pending"}</span>
             <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
           </div>
-          <div className="flex items-center justify-between mt-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-center justify-between mt-4">
+            <div className="flex items-center w-full">
+              <Label className="text-sm font-medium text-gray-500">Mark as {task.completed ? "Pending" : "Completed"}</Label>
+              <Checkbox
+                checked={task.completed}
+                onCheckedChange={onComplete}
+                className="ml-4"
+              />
+            </div>
             <div className="flex items-center gap-2">
               <Button
                 onClick={onDelete}
@@ -95,11 +103,7 @@ export const TaskCard = ({ task, setTasks }: TaskCardProps) => {
                 Edit
               </Button>
             </div>
-            <Checkbox
-              checked={task.completed}
-              onCheckedChange={onComplete}
-              className="ml-4"
-            />
+            <div></div>
           </div>
         </div>
       )}

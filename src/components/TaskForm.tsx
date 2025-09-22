@@ -62,7 +62,7 @@ export const TaskForm = ({
       title: task?.title || "",
       description: task?.description || "",
       priority: task?.priority || "high",
-      dueDate: task?.dueDate || "",
+      dueDate: new Date(task?.dueDate) || undefined,
     },
     mode: "onChange",
   });
@@ -187,10 +187,7 @@ export const TaskForm = ({
                                 setOpen(false);
                                 field.onChange(date);
                               }}
-                              disabled={(date) =>
-                                date <= new Date() ||
-                                date < new Date("1900-01-01")
-                              }
+                              disabled={(date) => date <= new Date()}
                             />
                           </PopoverContent>
                         </Popover>
