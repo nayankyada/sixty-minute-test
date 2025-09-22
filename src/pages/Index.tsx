@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Clock, CheckCircle2, Plus, FileText, AlertTriangle } from "lucide-react";
 import { useTimer } from "@/hooks/useTimer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { TaskForm } from "@/components/TaskForm";
 
 // TODO: Define proper TypeScript interfaces for Task
 // interface Task {
@@ -197,9 +198,7 @@ const Index = () => {
                     <CardDescription>Create a new task to manage your work</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground">
-                      🚧 TODO: Implement the TaskForm component here
-                    </p>
+                    <TaskForm setShowForm={setShowForm} setTasks={setTasks}/>
                     <p className="text-sm mt-2 text-muted-foreground">
                       Form should include: title, description, priority, due date
                     </p>
