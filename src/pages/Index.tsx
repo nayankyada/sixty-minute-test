@@ -5,6 +5,8 @@ import { Clock, CheckCircle2, Plus, FileText, AlertTriangle } from "lucide-react
 import { useTimer } from "@/hooks/useTimer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TaskForm } from "@/components/TaskForm";
+import { Task, TaskFormData } from "@/types/Task";
+import { TaskCard } from "@/components/TaskCard";
 
 // TODO: Define proper TypeScript interfaces for Task
 // interface Task {
@@ -19,7 +21,7 @@ import { TaskForm } from "@/components/TaskForm";
 
 const Index = () => {
   // TODO: Implement state management for tasks
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<Task[]>(JSON.parse(localStorage.getItem("tasks") || "[]"));
   const [showForm, setShowForm] = useState(false);
   const [testStarted, setTestStarted] = useState(false);
   
@@ -36,6 +38,10 @@ const Index = () => {
     setTasks([]);
     setShowForm(false);
   };
+
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -221,9 +227,9 @@ const Index = () => {
                 ) : (
                   <div className="grid gap-4">
                     {/* TODO: Map through tasks and render TaskCard components */}
-                    <p className="text-muted-foreground">
-                      🚧 TODO: Implement TaskCard components here
-                    </p>
+                    {tasks.map((task: Task, index: number) => (
+                      <TaskCard key={index} task={task} setTasks={setTasks} />
+                    ))}
                   </div>
                 )}
               </div>

@@ -11,14 +11,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Task, TaskFormData } from "@/types/Task";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronDownIcon } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Calendar } from "./ui/calendar";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
-import { Label } from "./ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import {
   Select,
   SelectContent,
@@ -27,6 +24,9 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { ChevronDownIcon } from "lucide-react";
+import { Label } from "./ui/label";
 
 export const taskValidationSchema = z.object({
   title: z
@@ -49,27 +49,44 @@ interface TaskFormProps {
   task?: Task;
 }
 
-export const TaskForm = ({ setShowForm, setTasks, task }: TaskFormProps) => {
+export const TaskForm = ({
+  setShowForm,
+  setTasks,
+  mode = "add",
+  task,
+}: TaskFormProps) => {
   const [open, setOpen] = useState(false);
   const form = useForm({
     resolver: zodResolver(taskValidationSchema),
     defaultValues: {
       title: task?.title || "",
       description: task?.description || "",
-      priority: task?.priority || "low",
+      priority: task?.priority || "high",
       dueDate: task?.dueDate || "",
     },
     mode: "onChange",
   });
 
-  const onSubmit = (values: TaskFormData) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((t) => (t.id === task?.id ? { ...t, ...values } : t))
-    );
-
-    form.reset();
-    setShowForm(false);
-  };
+  const onSubmit = useCallback(
+    (values: TaskFormData) => {
+      if (mode === "add") {
+        const newTask = {
+          ...values,
+          id: crypto.randomUUID(),
+          completed: false,
+          createdAt: new Date(),
+        };
+        setTasks((prevTasks) => [...prevTasks, newTask]);
+      } else {
+        setTasks((prevTasks) =>
+          prevTasks.map((t) => (t.id === task?.id ? { ...t, ...values } : t))
+        );
+      }
+      form.reset();
+      setShowForm(false);
+    },
+    [mode, task?.id, setTasks, form, setShowForm]
+  );
 
   return (
     <Card>
@@ -86,7 +103,7 @@ export const TaskForm = ({ setShowForm, setTasks, task }: TaskFormProps) => {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <Label htmlFor="title">Task title</Label>
+                      <Label>Title</Label>
                       <FormControl>
                         <Input placeholder="Task title..." {...field} />
                       </FormControl>
@@ -99,7 +116,7 @@ export const TaskForm = ({ setShowForm, setTasks, task }: TaskFormProps) => {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <Label htmlFor="description">Task description</Label>
+                      <Label>Description</Label>
                       <FormControl>
                         <Textarea
                           placeholder="Task description..."
@@ -115,7 +132,7 @@ export const TaskForm = ({ setShowForm, setTasks, task }: TaskFormProps) => {
                   name="priority"
                   render={({ field }) => (
                     <FormItem>
-                      <Label htmlFor="priority">Task priority</Label>
+                      <Label>Priority</Label>
                       <FormControl>
                         <Select
                           {...field}
@@ -141,7 +158,7 @@ export const TaskForm = ({ setShowForm, setTasks, task }: TaskFormProps) => {
                   name="dueDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-1">
-                      <Label htmlFor="date">Task due date</Label>
+                      <Label>Due Date</Label>
                       <FormControl>
                         <Popover open={open} onOpenChange={setOpen}>
                           <PopoverTrigger asChild>
@@ -187,7 +204,7 @@ export const TaskForm = ({ setShowForm, setTasks, task }: TaskFormProps) => {
               <div className="flex gap-2">
                 <Button type="submit">
                   {" "}
-                  Add Task
+                  {mode === "add" ? "Add Task" : "Update Task"}
                 </Button>
                 <Button
                   type="button"
